@@ -196,52 +196,86 @@ class SnakeGame : IRenderable
 {
     private static readonly Position Origin = new Position(0, 0);
 
-    private Direction _currentDirection;
-    private Direction _nextDirection;
-    private Snake _snake;
+    private Direction _currentDirection1;
+    private Direction _nextDirection1;
+    private Snake _snake1;
+
+    private Direction _currentDirection2;
+    private Direction _nextDirection2;
+    private Snake _snake2;
+
     private Apple _apple;
 
     public SnakeGame()
     {
-        _snake = new Snake(Origin, initialSize: 5);
+        _snake1 = new Snake(Origin, initialSize: 5);
+        _snake2 = new Snake(new Position(10, 10), initialSize: 5); // Starting position for the second snake
         _apple = CreateApple();
-        _currentDirection = Direction.Right;
-        _nextDirection = Direction.Right;
+        _currentDirection1 = Direction.Right;
+        _nextDirection1 = Direction.Right;
+
+        _currentDirection2 = Direction.Right;
+        _nextDirection2 = Direction.Right;
     }
 
-    public bool GameOver => _snake.Dead;
+    public bool GameOver => _snake1.Dead || _snake2.Dead;
 
+    Direction newDirection1 = Direction.Right;
+    Direction newDirection2 = Direction.Right;
     public void OnKeyPress(ConsoleKey key)
     {
+
+
         switch (key)
         {
+            case ConsoleKey.W:
+                newDirection1 = Direction.Up;
+                break;
+
+            case ConsoleKey.A:
+                newDirection1 = Direction.Left;
+                break;
+
+            case ConsoleKey.S:
+                newDirection1 = Direction.Down;
+                break;
+
+            case ConsoleKey.D:
+                newDirection1 = Direction.Right;
+                break;
+
             case ConsoleKey.UpArrow:
-                _nextDirection = Direction.Up;
+                newDirection2 = Direction.Up;
                 break;
 
             case ConsoleKey.LeftArrow:
-                _nextDirection = Direction.Left;
+                newDirection2 = Direction.Left;
                 break;
 
             case ConsoleKey.DownArrow:
-                _nextDirection = Direction.Down;
+                newDirection2 = Direction.Down;
                 break;
 
             case ConsoleKey.RightArrow:
-                _nextDirection = Direction.Right;
+                newDirection2 = Direction.Right;
                 break;
 
             default:
                 return;
         }
 
-        // Snake cannot turn 180 degrees.
-        if (_nextDirection != OppositeDirectionTo(_currentDirection))
+        // Snake 1 cannot turn 180 degrees.
+        if (newDirection1 != OppositeDirectionTo(_currentDirection1))
         {
-            _nextDirection = _nextDirection;
+            _nextDirection1 = newDirection1;
+        }
+
+        // Snake 2 cannot turn 180 degrees.
+        if (newDirection2 != OppositeDirectionTo(_currentDirection2))
+        {
+            _nextDirection2 = newDirection2;
         }
     }
-
     public void OnGameTick()
     {
         if (GameOver) throw new InvalidOperationException();

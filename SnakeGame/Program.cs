@@ -38,3 +38,19 @@ readonly struct Position
     public Position RightBy(int n) => new Position(Top, Left + n);
     public Position DownBy(int n) => new Position(Top + n, Left);
 }
+
+class Apple : IRenderable
+{
+    public Apple(Position position)
+    {
+        Position = position;
+    }
+
+    public Position Position { get; }
+
+    public void Render()
+    {
+        Console.SetCursorPosition(Position.Left, Position.Top);
+        Console.Write("A");
+    }
+}

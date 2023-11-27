@@ -246,18 +246,54 @@ class SnakeGame : IRenderable
     {
         if (GameOver) throw new InvalidOperationException();
 
-        _currentDirection = _nextDirection;
-        _snake.Move(_currentDirection);
+        _currentDirection1 = _nextDirection1;
+        _snake1.Move(_currentDirection1);
 
-        if (_snake.Head.Equals(_apple.Position))
+        _currentDirection2 = _nextDirection2;
+        _snake2.Move(_currentDirection2);
+
+        // Sprawdzenie, czy którykolwiek z węży nie zderzył się z drugim wężem
+        if (_snake1.Head.Equals(_snake2.Head))
         {
-            _snake.Grow();
+            _snake1.Dead = true;
+            _snake2.Dead = true;
+        }
+
+        // Sprawdzenie, czy którykolwiek z węży nie zderzył się ze ścianą
+        if (_snake1.Head.Top == -1 || _snake1.Head.Top == Console.WindowHeight - 1 ||
+            _snake1.Head.Left == -1 || _snake1.Head.Left == Console.WindowWidth - 1)
+        {
+            _snake1.Dead = true;
+        }
+
+        if (_snake2.Head.Top == 0 || _snake2.Head.Top == Console.WindowHeight - 1 ||
+            _snake2.Head.Left == 0 || _snake2.Head.Left == Console.WindowWidth - 1)
+        {
+            _snake2.Dead = true;
+        }
+
+        // Jeżeli którykolwiek z węży zjadł jabłko, to dodajemy nowe
+        if (_snake1.Head.Equals(_apple.Position))
+        {
+            _snake1.Grow();
             _apple = CreateApple();
         }
 
-        if (_snake.Body.Any(bodyPart => bodyPart.Equals(_snake.Head)))
+        if (_snake2.Head.Equals(_apple.Position))
         {
-            _snake.Dead = true;
+            _snake2.Grow();
+            _apple = CreateApple();
+        }
+
+        // Sprawdzenie, czy którykolwiek z węży zderzył się z samym sobą
+        if (_snake1.Body.Any(bodyPart => bodyPart.Equals(_snake1.Head)) ||
+            _snake2.Body.Any(bodyPart => bodyPart.Equals(_snake2.Head)) ||
+            _snake1.Body.Any(bodyPart => bodyPart.Equals(_snake2.Head)) ||
+            _snake2.Body.Any(bodyPart => bodyPart.Equals(_snake1.Head))
+            )
+        {
+            _snake1.Dead = true;
+            _snake2.Dead = true;
         }
     }
 

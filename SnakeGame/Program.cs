@@ -140,3 +140,108 @@ class Snake : IRenderable
     private static bool PositionIsValid(Position position) =>
         position.Top >= 0 && position.Left >= 0;
 }
+
+class SnakeGame : IRenderable
+{
+    private static readonly Position Origin = new Position(0, 0);
+
+    private Direction _currentDirection;
+    private Direction _nextDirection;
+    private Snake _snake;
+    private Apple _apple;
+
+    public SnakeGame()
+    {
+        _snake = new Snake(Origin, initialSize: 5);
+        _apple = CreateApple();
+        _currentDirection = Direction.Right;
+        _nextDirection = Direction.Right;
+    }
+
+    public bool GameOver => _snake.Dead;
+
+    public void OnKeyPress(ConsoleKey key)
+    {
+        switch (key)
+        {
+            case ConsoleKey.UpArrow:
+                _nextDirection = Direction.Up;
+                break;
+
+            case ConsoleKey.LeftArrow:
+                _nextDirection = Direction.Left;
+                break;
+
+            case ConsoleKey.DownArrow:
+                _nextDirection = Direction.Down;
+                break;
+
+            case ConsoleKey.RightArrow:
+                _nextDirection = Direction.Right;
+                break;
+
+            default:
+                return;
+        }
+
+        // Snake cannot turn 180 degrees.
+        if (_nextDirection != OppositeDirectionTo(_currentDirection))
+        {
+            _nextDirection = _nextDirection;
+        }
+    }
+
+    public void OnGameTick()
+    {
+        if (GameOver) throw new InvalidOperationException();
+
+        _currentDirection = _nextDirection;
+        _snake.Move(_currentDirection);
+
+        if (_snake.Head.Equals(_apple.Position))
+        {
+            _snake.Grow();
+            _apple = CreateApple();
+        }
+
+        if (_snake.Body.Any(bodyPart => bodyPart.Equals(_snake.Head)))
+        {
+            _snake.Dead = true;
+        }
+    }
+
+    public void Render()
+    {
+        Console.Clear();
+        _snake.Render();
+        _apple.Render();
+        Console.SetCursorPosition(0, 0);
+    }
+
+    private static Direction OppositeDirectionTo(Direction direction)
+    {
+        switch (direction)
+        {
+            case Direction.Up: return Direction.Down;
+            case Direction.Left: return Direction.Right;
+            case Direction.Right: return Direction.Left;
+            case Direction.Down: return Direction.Up;
+            default: throw new ArgumentOutOfRangeException();
+        }
+    }
+
+    private static Apple CreateApple()
+    {
+        // Can be factored elsewhere.
+        const int numberOfRows = 20;
+        const int numberOfColumns = 20;
+
+        var random = new Random();
+        var top = random.Next(0, numberOfRows + 1);
+        var left = random.Next(0, numberOfColumns + 1);
+        var position = new Position(top, left);
+        var apple = new Apple(position);
+
+        return apple;
+    }
+}

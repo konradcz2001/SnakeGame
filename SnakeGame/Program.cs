@@ -176,6 +176,18 @@ class Snake : IRenderable
         }
     }
 
+    public void Render2()
+    {
+        Console.SetCursorPosition(Head.Left, Head.Top);
+        Console.Write("0");
+
+        foreach (var position in Body)
+        {
+            Console.SetCursorPosition(position.Left, position.Top);
+            Console.Write("■");
+        }
+    }
+
     private static bool PositionIsValid(Position position) =>
         position.Top >= 0 && position.Left >= 0;
 }
@@ -252,7 +264,8 @@ class SnakeGame : IRenderable
     public void Render()
     {
         Console.Clear();
-        _snake.Render();
+        _snake1.Render();
+        _snake2.Render2();
         _apple.Render();
         Console.SetCursorPosition(0, 0);
     }
